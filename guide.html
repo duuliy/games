@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        *{margin: 0;  padding: 0;
+        }
+        #contentdiv{  width: 100%;  height: 688px;  overflow: hidden;
+        }
+        #startdiv{  background-image: url("冒险岛/readyBg.jpg");  background-size:cover;  background-position: 0 -380px;  width: 100%;  height: 688px;  overflow: hidden;
+        }
+        #startdiv>img:nth-of-type(1){  width: 255px;  height: 377px;  margin-left: 130px;  float: left;
+        }
+        #btndiv{  margin-top: 420px;  margin-left: 350px;  background-image: url("冒险岛/start.gif");  width: 252px;  height: 65px;
+        }
+        #btndiv:hover{  background-image: url("冒险岛/startOver.gif");
+        }
+        #maindiv{  background-image: url("冒险岛/bg.jpg");  background-size:cover;  background-position: 0 -80px;  width: 100%;  height: 688px;  overflow: hidden;  display: none;
+        }
+        #scorediv>img{  top: 20px;  right: 0;
+        }
+        #timediv{  position: absolute;  left: 550px;  top: 50px;
+        }
+        #timediv>img:nth-of-type(2){  margin-left: 35px;
+        }
+        #timediv>img:nth-of-type(3){  margin-left: 60px;
+        }
+        #timediv>img:nth-of-type(4){ margin-left: 95px;
+        }
+        #timediv>img:nth-of-type(5){  margin-left: 130px;
+        }
+        #turndiv{  position: absolute;  width: 100px;  height: 250px;
+        }
+        #turndiv>img:nth-of-type(2){  margin-top: 50px;
+        }
+        #turndiv>img:nth-of-type(3){  margin-left: 0px;  margin-top: 220px;
+        }
+        img{  position: absolute;
+        }
+        #score{  position: absolute;  margin-top: 25px;  margin-left: 1290px;
+        }
+        #baowu{  position: absolute;  margin-top: 230px;  margin-left: 10px;
+        }
+        #warp{  width: 220px;  height: 200px;  background-image: url("冒险岛/ui/tipBg.png");  position: absolute;  top: 150px;  left: 550px;  display: none; z-index: 999;
+        }
+        #warp>img{  margin-left: 130px;
+        }
+        #alert{  width: 200px;  height: 110px;  margin-left: 20px;  margin-top: 30px;
+        }
+        span{  color: red;  font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+<div id="contentdiv">
+    <div id="startdiv">
+        <img src="冒险岛/QQ截图20170913152750.png" alt="">
+        <div id="btndiv"></div>
+    </div>
+    <div id="maindiv">
+        <embed height="0" width="0" src="audio/Tungevaag & Raaban - Samsara.mp3"></embed>
+        <div id="scorediv">
+            <img src="冒险岛/ui/RunnerGame.gif" alt="">
+            <div id="score">0</div>
+        </div>
+        <div id="timediv">
+            <img src="冒险岛/num/0.gif" alt="">
+            <img src="冒险岛/num/1.gif"  id="time1" alt="">
+            <img src="冒险岛/num/d.png"  alt="">
+            <img src="冒险岛/num/3.gif" id="time2" alt="">
+            <img src="冒险岛/num/0.gif" id="time3" alt="">
+        </div>
+        <div id="turndiv">
+            <img src="冒险岛/ui/back.gif" alt="">
+            <img src="冒险岛/ui/exp0.png" alt="">
+            <img src="冒险岛/ui/boom/boom3.png" alt="">
+            <div id="baowu">0</div>
+        </div>
+        <div id="warp">
+            <div id="alert">
+            游戏结束！ <br>
+            您的分数为： <br>
+            <span id="num">0</span>分！若发现BUG， <br>
+            请自行解决
+            </div>
+            <img src="冒险岛/ui/tipY.gif" id="gg" alt="">
+        </div>
+    </div>
+</div>
+<script>
+    var star=document.getElementById("startdiv");
+    var main=document.getElementById("maindiv");
+    var btn=document.getElementById("btndiv");
+    var arrDilong=[];
+    var arrlong=[];
+    var arrbullets=[];
+    var arrDibullets=[];
+    var arrbaowu=[];
+    var score=0;
+    var baowunum=0;
+    var s=document.getElementById("score");
+    var m=document.getElementById("baowu");
+    var o=document.getElementById("warp");
+    var n=document.getElementById("num");
+    var g=document.getElementById("gg");
+        //怪物
+        var createlongTimer=setInterval(createDilong,3000);
+        var createlongTimer2=setInterval(createDilong2,5000);
+        var createlongTimer3=setInterval(createDilong3,12000);
+        var createlongTimer4=setInterval(createDilong4,60000);
+        var moveDilongTimer=setInterval(moveDilong,300);
+        var moveDibulletTimer=setInterval(moveDibullet,260);
+        //龙
+        var movebulletTimer=setInterval(movebullet,200);
+        var shoushiTimer=setInterval(shoushi,500);
+        var pzbwtimer=setInterval(pzbw,500);
+        var pzztimer=setInterval(pzz,100);
+        var pengzhuantimer=setInterval(pengzhuan,50);
+        var pztimer=setInterval(pz,50);
+    //    开始
+    timeShow();
+    btn.onclick=function () {
+        star.style.display="none";
+        main.style.display="block";
+    };
+    //  重来
+    g.onclick=function () {
+        star.style.display="block";
+        main.style.display="none";
+        location.reload();
+    };
+    //游戏结束
+    function gameover() {
+        clearInterval(createlongTimer);
+        clearInterval(createlongTimer2);
+        clearInterval(createlongTimer3);
+        clearInterval(createlongTimer4);
+        clearInterval(moveDilongTimer);
+        clearInterval(moveDibulletTimer);
+        clearInterval(movebulletTimer);
+        clearInterval(shoushiTimer );
+        clearInterval(pzbwtimer);
+        clearInterval(pzztimer);
+        clearInterval(pengzhuantimer);
+        clearInterval(pztimer);
+        clearInterval(t1);
+        o.style.display="block";
+        n.innerHTML=score
+    }
+    //初始化
+    //己方龙
+function Dong(x,y,src,speed,bleed) {
+    this.x=x;
+    this.y=y;
+    this.src=src;
+    this.speed=speed;
+    this.bleed=bleed;
+    this.isdead=false;
+    this.imgNode=document.createElement("img");
+    this.shot=function () {
+        var width=this.imgNode.width;
+        var height=this.imgNode.height;
+        var ttop=parseInt(this.imgNode.style.top);
+        var lleft=parseInt(this.imgNode.style.left);
+        var x=ttop+width/2;
+        var y=lleft+height/2;
+         bullet=new Bullet(y,x,"冒险岛/dragon/small/att.gif",25);
+        arrbullets.push(bullet)
+    };
+    this.shot2=function () {
+        var width=this.imgNode.style.width;
+        var height=this.imgNode.style.height;
+        var ttop=parseInt(this.imgNode.style.top);
+        var lleft=parseInt(this.imgNode.style.left);
+        var x=ttop+width/2+20;
+        var y=lleft+height/2+60;
+        var Dibullet=new Bullet(y,x,"冒险岛/enemy/boss/attackBall.gif",-25);
+        arrDibullets.push(Dibullet)
+    };
+    this.move=function () {
+        var left=(parseInt(this.imgNode.style.left)-this.speed);
+        this.imgNode.style.left=left+"px";
+    };
+    this.init=function () {
+        this.imgNode.src=this.src;
+        this.imgNode.style.left=x+"px";
+        this.imgNode.style.top=y+"px";
+        main.appendChild(this.imgNode);
+    };
+    this.init()
+}
+//初始化己方子弹
+    function Bullet(x,y,src,speed){
+        this.x=x;
+        this.y=y;
+        this.src=src;
+        this.speed=speed;
+        this.isdead=false;
+        this.imgNode=document.createElement("img");
+        this.move=function () {
+            var left=(parseInt(this.imgNode.style.left)+this.speed);
+            this.imgNode.style.left=left+"px";
+        };
+        this.init=function () {
+            this.imgNode.src=this.src;
+            this.imgNode.style.left=x+"px";
+            this.imgNode.style.top=y+"px";
+            main.appendChild(this.imgNode);
+        };
+        this.init();
+    }
+//创造敌方怪物
+//1.
+function  createDilong() {
+    var x=1260;
+    var y=parseInt(Math.random()*480+60);
+    var long=new Dong(x,y,"冒险岛/enemy/bird/move.gif",10,3);
+    arrDilong.push(long);
+}
+//2.
+function  createDilong2() {
+    var x=1260;
+    var y=parseInt(Math.random()*480+60);
+    var long=new Dong(x,y,"冒险岛/enemy/plane/move.gif",20,10);
+    arrDilong.push(long);
+}
+//3.
+function  createDilong3() {
+    var x=1260;
+    var y=parseInt(Math.random()*480+60);
+    var long=new Dong(x,y,"冒险岛/enemy/ghost/move.gif",15,45);
+    arrDilong.push(long);
+}
+//boss
+function  createDilong4() {
+    var x=1260;
+    var y=parseInt(Math.random()*480+60);
+    boss=new Dong(x,y,"冒险岛/enemy/boss/move.gif",5,120);
+    arrDilong.push(boss);
+}
+setInterval(function () {
+    boss.shot2();
+},5000);
+//boss的子弹
+    function moveDibullet(){
+        for(var i=0;i<arrDibullets.length;i++){
+            var left =parseInt(arrDibullets[i].imgNode.style.left);
+            if(left<50){
+                main.removeChild(arrDibullets[i].imgNode);
+                arrDibullets.splice(i,1);
+                i--
+            }else{
+                arrDibullets[i].move();
+            }
+        }
+    }
+//移动敌方怪物
+function moveDilong() {
+    for(var i=0;i<arrDilong.length;i++){
+        var left=parseInt(arrDilong[i].imgNode.style.left);
+        if(left>=50){
+            arrDilong[i].move();
+        }else{
+            main.removeChild(arrDilong[i].imgNode);
+            arrDilong.splice(i,1);
+            i--
+        }
+    }
+}
+    //创建己方龙
+    Ourlong();
+    function Ourlong(){
+        var x=50;
+        var y=320;
+        long=new Dong(x,y,"冒险岛/dragon/small/stand.gif",20,1);
+        arrlong.push(long)
+    }
+    //己方龙的变换
+    function bigchange(a,b,c,d,e) {
+        if(score<=10){
+            long.imgNode.src=a;
+        }else if(score>10&&score<=30){
+            long.imgNode.src=b;
+            long.bleed+=1;
+            bullet.imgNode.src="冒险岛/dragon/middle/att.gif"
+        }else if(score>30&&score<=60){
+            long.imgNode.src=c;
+            long.bleed+=1;
+            bullet.imgNode.src="冒险岛/dragon/big/att.gif"
+        }else if(score>60&&score<=100){
+            long.imgNode.src=d;
+            long.bleed+=1;
+            bullet.imgNode.src="冒险岛/dragon/large/att.gif"
+        }else if(score>100){
+            long.imgNode.src=e;
+            long.bleed+=1;
+            bullet.imgNode.src="冒险岛/dragon/final/att.gif"
+        }
+    };
+//        己方龙移动
+    window.onload = function() {
+        key = {l: null, t: null, r: null, b: null,g: null,z:null};
+        document.onkeydown = function () {
+            var e = window.event || arguments[0];
+            switch (e.keyCode) {
+                case 37:
+                    key.l = true;
+                    break;
+                case 38:
+                    key.t = true;
+                    break;
+                case 39:
+                    key.r = true;
+                    break;
+                case 40:
+                    key.b = true;
+                    break;
+                case 32:
+                    key.g = true;
+                    break;
+                case 13:
+                    key.z = true;
+                    break;
+            }
+        };
+        setInterval(function moveOurplane(){
+            var left=parseInt(long.imgNode.style.left);
+            var top=parseInt(long.imgNode.style.top);
+            if(key.l){ //←
+                if (left>5){
+                    long.imgNode.style.left=(left-20)+"px";//                    change("冒险岛/dragon/small/move.gif");
+                }
+            }if(key.t){ // ↑
+                if(top>0){
+                    long.imgNode.style.top=(top-20)+"px";
+                }
+            }if(key.r){ // →
+                if(left<1200){
+                    long.imgNode.style.left=(left+20)+"px";
+                }
+            }if(key.b){ // ↓
+                if(top<520){
+                    long.imgNode.style.top=(top+20)+"px";
+                }
+            }if(key.g){// 空格
+                setTimeout(function () {
+                    long.shot();
+                },900);
+                bigchange("冒险岛/dragon/small/magicmissile.gif","冒险岛/dragon/middle/magicmissile.gif","冒险岛/dragon/big/magicmissile.gif","冒险岛/dragon/large/magicmissile.gif","冒险岛/dragon/final/magicmissile.gif");
+            }
+            if(key.z) { // ↓
+                if(baowunum>=43) {
+                    baowunum = baowunum - 43;
+                    bigbullet()
+                }
+            }
+        },100);
+        document.onkeyup = function(){
+            var e = window.event || arguments[0];
+            switch(e.keyCode){
+                case 37:
+                    key.l = false;
+                    break;
+                case 38:
+                    key.t = false;
+                    break;
+                case 39:
+                    key.r = false;
+                    break;
+                case 40:
+                    key.b = false;
+                    break;
+                case 32:
+                    key.g = false;
+                    setTimeout(function () {
+                        bigchange("冒险岛/dragon/small/stand.gif","冒险岛/dragon/middle/stand.gif","冒险岛/dragon/big/stand.gif","冒险岛/dragon/large/stand.gif","冒险岛/dragon/final/stand.gif");
+                    },800);
+                    break;
+                case 13:
+                    key.z = false;
+                    setTimeout(function () {
+                        main.style.backgroundImage="url(冒险岛/bg.jpg)";
+                    },2600);
+                    break;
+            }
+        }
+    }
+//    控制己方子弹
+    function movebullet(){
+        for(var i=0;i<arrbullets.length;i++){
+            var left =parseInt(arrbullets[i].imgNode.style.left);
+            if(left>1280){
+                main.removeChild(arrbullets[i].imgNode);
+                arrbullets.splice(i,1);
+                i--
+            }else{
+                arrbullets[i].move();
+            }
+        }
+    }
+    //大招当当当
+    function bigbullet() {
+        main.style.backgroundImage="url(冒险岛/skill.gif)";
+        for(var i=0;i<=arrDilong.length;i++){
+
+            if((arrDilong[i].bleed-20)<=0){
+                score+=arrDilong[i].bleed;
+                arrDilong[i].isdead=true;
+            }
+            arrDilong[i].bleed=arrDilong[i].bleed-20;
+        }
+    }
+    //碰撞事件
+    //敌方怪物与己方龙判断
+    function pz() {
+        for(var i=0;i<arrDilong.length;i++){
+            var Ditop=parseInt(arrDilong[i].imgNode.style.top);
+            var Dileft=parseInt(arrDilong[i].imgNode.style.left);
+            var Diwidth=arrDilong[i].imgNode.width;
+            var Diheight=arrDilong[i].imgNode.height;
+            var ourtop=parseInt(long.imgNode.style.top);
+            var ourleft=parseInt(long.imgNode.style.left);
+            var ourwidth=parseInt(long.imgNode.width);
+            var ourheight=parseInt(long.imgNode.height);
+            if((Dileft>(ourleft-Diwidth)&&Dileft<(ourleft+ourwidth))
+                &&(Ditop>(ourtop-Diheight)&&Ditop<(ourtop+ourheight))){
+                //1.龙爆炸 //血量为0
+                long.bleed--;
+                if(long.bleed==0){
+                    long.imgNode.src="冒险岛/dragon/dead/die.gif";
+                    long.isdead=true;
+                    gameover();
+                }
+            }
+        }}
+    //敌方怪物与我方子弹碰撞
+    function pengzhuan(){
+        for(var i=0;i<arrbullets.length;i++){//子弹
+            var zidanleft=parseInt(arrbullets[i].imgNode.style.left);
+            var zidantop=parseInt(arrbullets[i].imgNode.style.top);
+            var ziwidth=arrbullets[i].imgNode.width;
+            var ziheight=arrbullets[i].imgNode.height;
+            for (var j=0;j<arrDilong.length;j++){
+                var planeleft=parseInt(arrDilong[j].imgNode.style.left);
+                var planetop=parseInt(arrDilong[j].imgNode.style.top);
+                var planewidth=arrDilong[j].imgNode.width;
+                var planeheight=arrDilong[j].imgNode.height;
+                if((zidanleft>(planeleft-ziwidth)&&zidanleft<(planeleft+planewidth))
+                    &&(zidantop>(planetop-ziheight)&&zidantop<(planetop+planeheight))){
+                    //1.怪物爆炸   //血量为0
+                    if(score<=10){
+                        arrDilong[j].bleed--;
+                    }else if(score>10&&score<=30){
+                        arrDilong[j].bleed=arrDilong[j].bleed-2;
+                    }else if(score>30&&score<=60){
+                        arrDilong[j].bleed=arrDilong[j].bleed-3;
+                    }else if(score>60&&score<=100){
+                        arrDilong[j].bleed=arrDilong[j].bleed-4;
+                    }else if(score>100){
+                        arrDilong[j].bleed=arrDilong[j].bleed-5;
+                    }
+                    var num=0;
+                    num++;
+                    s.innerHTML=score; //计算分数
+                    if(arrDilong[j].bleed<=0){
+                        bigchange("冒险岛/dragon/small/stand.gif","冒险岛/dragon/middle/stand.gif","冒险岛/dragon/big/stand.gif","冒险岛/dragon/large/stand.gif","冒险岛/dragon/final/stand.gif");
+                        score=score+num;
+                        if(score<=10){
+                            arrDilong[j].imgNode.src="冒险岛/dragon/small/hit.gif";
+                        }else if(score>10&&score<=30){
+                            arrDilong[j].imgNode.src="冒险岛/dragon/middle/hit.gif";
+                        }else if(score>30&&score<=60){
+                            arrDilong[j].imgNode.src="冒险岛/dragon/big/hit.gif";
+                        }else if(score>60&&score<=100){
+                            arrDilong[j].imgNode.src="冒险岛/dragon/large/hit.gif";
+                        }else if(score>100){
+                            arrDilong[j].imgNode.src="冒险岛/dragon/final/hit.gif";
+                        };
+                        arrDilong[j].isdead=true;
+                        //宝物
+                        baowu=new Bullet(planeleft,planetop,"冒险岛/enemy/thing.gif",0);
+                        arrbaowu.push(baowu);
+                    }
+                    //1.子弹消失
+                    main.removeChild(arrbullets[i].imgNode);
+                    arrbullets.splice(i,1);
+                    i--;
+                    break;
+                }
+            }
+        }
+    }
+    //敌方子弹与我方龙碰撞
+    function pzz(){
+        for(var i=0;i<arrDibullets.length;i++){
+            var zidanleft=parseInt(arrDibullets[i].imgNode.style.left);
+            var zidantop=parseInt(arrDibullets[i].imgNode.style.top);
+            var ziwidth=arrDibullets[i].imgNode.width;
+            var ziheight=arrDibullets[i].imgNode.height;
+            var ourtop=parseInt(long.imgNode.style.top);
+            var ourleft=parseInt(long.imgNode.style.left);
+            var ourwidth=parseInt(long.imgNode.width);
+            var ourheight=parseInt(long.imgNode.height);
+            if((zidanleft>(ourleft-ziwidth)&&zidanleft<(ourleft+ourwidth))
+                &&(zidantop>(ourtop-ziheight)&&zidantop<(ourtop+ourheight))){
+                //1.龙爆炸
+                long.bleed--;
+                if(long.bleed==0){
+                    long.imgNode.src="冒险岛/enemy/boss/attackHit.gif";
+                    long.isdead=true;
+                gameover()
+            }}
+        }
+    }
+    //获得宝藏
+    function pzbw(){
+        for(var i=0;i<arrbaowu.length;i++){
+            var Ditop=parseInt(arrbaowu[i].imgNode.style.top);
+            var Dileft=parseInt(arrbaowu[i].imgNode.style.left);
+            var Diwidth=arrbaowu[i].imgNode.width;
+            var Diheight=arrbaowu[i].imgNode.height;
+            var ourtop=parseInt(long.imgNode.style.top);
+            var ourleft=parseInt(long.imgNode.style.left);
+            var ourwidth=parseInt(long.imgNode.width);
+            var ourheight=parseInt(long.imgNode.height);
+            if((Dileft>(ourleft-Diwidth)&&Dileft<(ourleft+ourwidth))
+                &&(Ditop>(ourtop-Diheight)&&Ditop<(ourtop+ourheight))){
+                //1.宝物消失
+                arrbaowu[i].imgNode.src="";
+                arrbaowu[i].isdead=true;
+                if(arrbaowu[i].isdead=true){
+                    baowunum++;
+                }
+            }
+        }m.innerHTML=baowunum
+    }
+    //收掉爆炸的部分
+    function shoushi(){
+        for(var i=0;i<arrDilong.length;i++){
+            if(arrDilong[i].isdead){
+                main.removeChild(arrDilong[i].imgNode);
+                arrDilong.splice(i,1);
+                i--
+            }
+        }
+    }
+    //时间
+    function timeShow() {
+        var times = 90;
+        t1 = setInterval(time, 1000);
+        function time() {
+            times--;
+            var time1 = document.getElementById("time1");
+            var time2 = document.getElementById("time2");
+            var time3 = document.getElementById("time3");
+            if (times >= 0) {
+                var s1, s2;
+                var m = String(parseInt(times / 60));
+                var s = parseInt(times % 60);
+                if (s > 9) {
+                    s1 = String(s).substr(0, 1);
+                    s2 = String(s).substr(1, 1);
+                } else {
+                    s1 = String(0);
+                    s2 = String(s).substr(0, 1);
+                }
+                time1.src = "冒险岛/num/" + m + ".gif";
+                time2.src = "冒险岛/num/" + s1 + ".gif";
+                time3.src = "冒险岛/num/" + s2 + ".gif";
+            } else {
+                clearInterval(t1);
+            }
+            if(times==0){
+                gameover();
+            }
+        }
+    }
+</script>
+</body>
+</html>

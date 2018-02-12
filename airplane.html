@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        #map{
+            width: 412px;
+            height: 618px;
+            background-image: url("飞机/bg1.png");
+            margin-left: 500px;
+            display: none;
+            position: relative;
+        }
+        #star{
+            width: 412px;
+            height: 618px;
+            background-image: url("飞机/start.png");
+            margin-left: 500px;
+            background-size: 100% 100%;
+        }
+        img{
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+<div id="star" onclick="mystar()"></div>
+<div id="map">
+    <img src="" id="ourair" alt="">
+</div>
+<script>
+    var mapdiv=document.getElementById("map");
+    var arrDiplane=[];
+    var arrOurplane=[];
+    var arrbullets=[];
+    var arrDibullets=[];
+    //初始化分数
+    var scores=0;
+    var createDiplanetTimer=setInterval(createDiplane,1000);
+    var moveDiplanetTimer=setInterval(moveDiplane,300);
+    var movebulletTimer=setInterval(movebullet,100);
+    var moveDibulletTimer=setInterval(moveDibullet,260);
+//    plane.shot()
+//    var shotDibulletTimer=setInterval((plane2.shot2,260);
+    var ourplane=document.getElementById("ourair");
+//开始
+    function mystar() {
+        var stardiv=document.getElementById("star");
+        stardiv.style.display="none";
+        mapdiv.style.display="block"
+    }
+
+    //属性： x,y,路径，速度，img节点，血量
+    //方法： 移动，组装（初始化），发射子弹
+
+    //初始化飞机
+    function Diplane(x,y,src,speed) {
+        this.x=x;
+        this.y=y;
+        this.src=src;
+        this.speed=speed;
+        this.bleed=2;
+        this.isdead=false;
+        this.imgNode=document.createElement("img");
+        this.idNode=document.getElementById("ourair");
+        this.shot=function () {
+            var width=this.imgNode.style.width;
+            var ttop=parseInt(ourplane.style.top);
+            var lleft=parseInt(ourplane.style.left);
+            var x=ttop+width/2-50;
+            var y=lleft+40-10;
+            var bullet=new Bullet(y,x,"飞机/bullet_03.png",10);
+//            bullet.ourinit();
+            arrbullets.push(bullet)
+        };
+        this.shot2=function () {
+            var width=this.imgNode.style.width;
+            var ttop=parseInt(this.imgNode.style.top);
+            var lleft=parseInt(this.imgNode.style.left);
+            var x=ttop+width/2+100;
+            var y=lleft+40-10;
+            var bullet=new DiBullet(y,x,"飞机/EnemyFire_03.png",10);
+//            bullet.ourinit();
+            arrDibullets.push(bullet)
+        };
+        this.move=function () {
+            var top=(parseInt(this.imgNode.style.top)+this.speed);
+            this.imgNode.style.top=top+"px";
+        };
+        this.init=function () {
+            this.imgNode.src=this.src;
+            this.imgNode.style.left=x+"px";
+            this.imgNode.style.top=y+"px";
+            mapdiv.appendChild(this.imgNode);
+        };
+        this.ourinit=function () {
+            this.idNode.src=this.src;
+            this.idNode.style.left=x+"px";
+            this.idNode.style.top=y+"px";
+//            idNode.appendChild(this.imgNode);
+        };
+    }
+    //己方子弹初始化
+    function Bullet(x,y,src,speed){
+        this.x=x;
+        this.y=y;
+        this.src=src;
+        this.speed=speed;
+        this.imgNode=document.createElement("img");
+        this.move=function () {
+            var top=(parseInt(this.imgNode.style.top)-this.speed);
+            this.imgNode.style.top=top+"px";
+        };
+        this.init=function () {
+            this.imgNode.src=this.src;
+            this.imgNode.style.left=x+"px";
+            this.imgNode.style.top=y+"px";
+            mapdiv.appendChild(this.imgNode);
+        };
+        this.init();
+    }
+    //敌方子弹初始化
+    function DiBullet(x,y,src,speed){
+        this.x=x;
+        this.y=y;
+        this.src=src;
+        this.speed=speed;
+        this.imgNode=document.createElement("img");
+        this.move=function () {
+            var top=(parseInt(this.imgNode.style.top)+this.speed);
+            this.imgNode.style.top=top+"px";
+        };
+        this.init=function () {
+            this.imgNode.src=this.src;
+            this.imgNode.style.left=x+"px";
+            this.imgNode.style.top=y+"px";
+            mapdiv.appendChild(this.imgNode);
+        };
+        this.init();
+    }
+    //创造敌方飞机
+    createDiplane();
+    function  createDiplane() {
+        var x=parseInt(Math.random()*370);
+        var y=0;
+        var plane=new Diplane(x,y,"飞机/BluePlane.png",10);
+        plane.init();
+        arrDiplane.push(plane);
+    }
+    //创造敌方boss飞机
+    createboss();
+    setInterval(createboss,20000);
+    function  createboss() {
+        var x=parseInt(Math.random()*280);
+        var y=0;
+         plane2=new Diplane(x,y,"飞机/LXPlane.png",2);
+        plane2.init();
+        plane2.shot2();
+        arrDiplane.push(plane2);
+    }
+    //移动敌方飞机
+    function moveDiplane() {
+        for(var i=0;i<arrDiplane.length;i++){
+            var top=parseInt(arrDiplane[i].imgNode.style.top);
+            if(top<=510){
+                arrDiplane[i].move();
+            }else{
+                mapdiv.removeChild(arrDiplane[i].imgNode);
+                arrDiplane.splice(i,1);
+                i--
+            }
+        }
+    }
+    //移动敌方子弹
+    function moveDibullet(){
+        for(var i=0;i<arrDibullets.length;i++){
+            var top =parseInt(arrDibullets[i].imgNode.style.top);
+            if(top>=520){
+                mapdiv.removeChild(arrDibullets[i].imgNode);
+                arrDibullets.splice(i,1);
+                i--
+            }else{
+                arrDibullets[i].move();
+            }
+        }
+    }
+    //创建己方飞机
+    Ourplan();
+    function Ourplan(){
+        var x=140;
+        var y=480;
+         plane=new Diplane(x,y,"飞机/LiPlane.png",10);
+        plane.ourinit();
+        arrOurplane.push(plane)
+    }
+//    己方飞机移动
+    window.onload = function() {
+        key = {l: null, t: null, r: null, b: null,g: null};
+        document.onkeydown = function () {
+            var e = window.event || arguments[0];
+            switch (e.keyCode) {
+                case 37:
+                    key.l = true;
+                    break;
+                case 38:
+                    key.t = true;
+                    break;
+                case 39:
+                    key.r = true;
+                    break;
+                case 40:
+                    key.b = true;
+                    break;
+                case 32:
+                    key.g = true;
+                    break;
+            }
+        };
+        setInterval(function moveOurplane(){
+            var left=parseInt(ourplane.style.left);
+            var top=parseInt(ourplane.style.top);
+            if(key.l){ //←
+                if (left>5){
+                    ourplane.style.left=(left-15)+"px";
+                }
+            }if(key.t){ // ↑
+                if(top>5){
+                    ourplane.style.top=(top-15)+"px";
+                }
+            }if(key.r){ // →
+                if(left<335){
+                    ourplane.style.left=(left+15)+"px";
+                }
+            }if(key.b){ // ↓
+                if(top<555){
+                    ourplane.style.top=(top+15)+"px";
+                }
+
+            }if(key.g){// 空格
+                plane.shot();
+        }
+        },100);
+        document.onkeyup = function(){
+            var e = window.event || arguments[0];
+            switch(e.keyCode){
+                case 37:
+                    key.l = false;
+                    break;
+                case 38:
+                    key.t = false;
+                    break;
+                case 39:
+                    key.r = false;
+                    break;
+                case 40:
+                    key.b = false;
+                    break;
+                case 32:
+                    key.g = false;
+                    break;
+            }
+        }
+    };
+    //移动己方子弹
+    function movebullet(){
+        for(var i=0;i<arrbullets.length;i++){
+            var top =parseInt(arrbullets[i].imgNode.style.top);
+            if(top==0){
+                mapdiv.removeChild(arrbullets[i].imgNode);
+                arrbullets.splice(i,1);
+                i--
+            }else{
+                arrbullets[i].move();
+            }
+        }
+    }
+    //碰撞事件
+    //敌方飞机与己方飞机判断
+    var pztimer=setInterval(pz,50);
+    function pz() {
+        for(var i=0;i<arrDiplane.length;i++){
+            var Ditop=parseInt(arrDiplane[i].imgNode.style.top);
+            var Dileft=parseInt(arrDiplane[i].imgNode.style.left);
+            var Diwidth=arrDiplane[i].imgNode.width;
+            var Diheight=arrDiplane[i].imgNode.height;
+            var ourtop=parseInt(ourplane.style.top);
+            var ourleft=parseInt(ourplane.style.left);
+            if((Dileft>(ourleft-Diwidth)&&Dileft<(ourleft+75))
+                &&(Ditop>(ourtop-Diheight)&&Ditop<(ourtop+50))){
+                //1.飞机爆炸
+                //血量为0
+                arrDiplane[i].bleed--;
+                if(arrDiplane[i].bleed==0){
+                    arrDiplane[i].imgNode.src="飞机/BeiJi_02.png";
+                    arrDiplane[i].isdead=true;
+                }
+        }
+    }
+        //敌方子弹与己方飞机判断
+        var pzztimer=setInterval(pzz,50);
+        function pzz(){
+            for(var i=0;i<arrDibullets.length;i++){
+                var zidanleft=parseInt(arrDibullets[i].imgNode.style.left);
+                var zidantop=parseInt(arrDibullets[i].imgNode.style.top);
+                var ziwidth=arrDibullets[i].imgNode.width;
+                var ziheight=arrDibullets[i].imgNode.height;
+                var ourtop=parseInt(ourplane.style.top);
+                var ourleft=parseInt(ourplane.style.left);
+                if((zidanleft>(ourleft-ziwidth)&&zidanleft<(ourleft+75))
+                    &&(zidantop>(ourtop-ziheight)&&zidantop<(ourtop+50))){
+                    //1.飞机爆炸
+                    ourplane.src="飞机/BeiJi_02.png";
+//                    mapdiv.removeChild(ourplane);
+                    }
+                }
+            }
+
+
+    //敌方飞机与我方子弹碰撞
+    var pengzhuantimer=setInterval(pengzhuan,50);
+    function pengzhuan(){
+        for(var i=0;i<arrbullets.length;i++){//子弹
+            var zidanleft=parseInt(arrbullets[i].imgNode.style.left);
+            var zidantop=parseInt(arrbullets[i].imgNode.style.top);
+            var ziwidth=arrbullets[i].imgNode.width;
+            var ziheight=arrbullets[i].imgNode.height;
+            for (var j=0;j<arrDiplane.length;j++){
+                var planeleft=parseInt(arrDiplane[j].imgNode.style.left);
+                var planetop=parseInt(arrDiplane[j].imgNode.style.top);
+                var planewidth=arrDiplane[j].imgNode.width;
+                var planeheight=arrDiplane[j].imgNode.height;
+                if((zidanleft>(planeleft-ziwidth)&&zidanleft<(planeleft+planewidth))
+                    &&(zidantop>(planetop-ziheight)&&zidantop<(planetop+planeheight))){
+                    //1.飞机爆炸
+                    //血量为0
+                    arrDiplane[j].bleed--;
+                    if(arrDiplane[j].bleed==0){
+                        arrDiplane[j].imgNode.src="飞机/BeiJi_02.png";
+                        arrDiplane[j].isdead=true;
+                    }
+                    //1.子弹消失
+                    mapdiv.removeChild(arrbullets[i].imgNode);
+                    arrbullets.splice(i,1);
+                    i--;
+                    break;
+                }
+            }
+        }
+    }
+    //收掉爆炸的部分
+    setInterval(shoushi,500);
+function shoushi(){
+        for(var i=0;i<arrDiplane.length;i++){
+            if(arrDiplane[i].isdead){
+                mapdiv.removeChild(arrDiplane[i].imgNode);
+                arrDiplane.splice(i,1);
+                i--
+            }
+        }
+}}
+//升级
+//    var difang=["xx","xx"];
+//    var arrjifen=[50,100,200];
+//    var gk=1;
+    //游戏暂停
+    //清除定时器
+</script>
+</body>
+</html>
